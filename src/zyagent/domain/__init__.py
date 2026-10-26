@@ -1,0 +1,1 @@
+"""Domain language for zyagent."""
