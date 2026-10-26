@@ -1,5 +1,7 @@
 # zyagent
 
+[![CI](https://github.com/wanname777/zyagent/actions/workflows/ci.yml/badge.svg)](https://github.com/wanname777/zyagent/actions/workflows/ci.yml)
+
 `zyagent` 是一个小而完整的 Agent 后端。项目参考视频
 [《10 分钟学会设计 Agent 架构》](https://www.bilibili.com/video/BV1winH6DEgt/)
 的分层方法，从领域语言开始设计，再由应用层编排流程、适配层连接外部系统。
