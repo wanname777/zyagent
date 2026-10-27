@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from typing import Dict, List, Optional
 
 from zyagent.domain.context import Context
@@ -8,6 +9,7 @@ from zyagent.domain.messages import (
     ConversationSummary,
     ToolResult,
     UserMessage,
+    now,
 )
 from zyagent.domain.roles import Assistant, ToolCallReviewer
 from zyagent.domain.session import Session
@@ -112,8 +114,22 @@ class AgentService:
         return compressed
 
     def send_message(self, session_id: str, text: str) -> AssistantMessage:
-        session = self.get_session(session_id).append(UserMessage.create(text))
+        session = self._repair_interrupted_tool_calls(self.get_session(session_id))
+        session = session.append(UserMessage.create(text))
         self.session_store.save(session)
+        return self._run_agent_loop(session)
+
+    def resume_session(self, session_id: str) -> AssistantMessage:
+        session = self._repair_interrupted_tool_calls(self.get_session(session_id))
+        if not session.messages:
+            raise ValueError("Cannot resume an empty session")
+        last_message = session.messages[-1]
+        if isinstance(last_message, AssistantMessage) and not last_message.tool_calls:
+            raise ValueError("Session already has a complete assistant response")
+        self.session_store.save(session)
+        return self._run_agent_loop(session)
+
+    def _run_agent_loop(self, session: Session) -> AssistantMessage:
         last_response: Optional[AssistantMessage] = None
 
         for _ in range(self.max_iterations):
@@ -135,19 +151,28 @@ class AgentService:
             if not response.tool_calls:
                 return response
 
+            review_session = session
             for call in response.tool_calls:
-                decision = self.model_client.generate(
-                    self.reviewer.context(session, call),
-                    self.reviewer_settings,
-                )
-                if not decision.allowed:
+                try:
+                    decision = self.model_client.generate(
+                        self.reviewer.context(review_session, call),
+                        self.reviewer_settings,
+                    )
+                except Exception as error:
                     result = ToolResult.create(
                         call.id,
-                        decision.reason or "Tool call rejected by reviewer.",
+                        f"Tool review failed: {error}",
                         is_error=True,
                     )
                 else:
-                    result = self._execute_tool(call.id, call.name, call.arguments)
+                    if not decision.allowed:
+                        result = ToolResult.create(
+                            call.id,
+                            decision.reason or "Tool call rejected by reviewer.",
+                            is_error=True,
+                        )
+                    else:
+                        result = self._execute_tool(call.id, call.name, call.arguments)
                 session = session.append(result)
                 self.session_store.save(session)
 
@@ -167,3 +192,45 @@ class AgentService:
             return ToolResult.create(call_id, tool.execute(arguments))
         except Exception as error:
             return ToolResult.create(call_id, str(error), is_error=True)
+
+    @staticmethod
+    def _repair_interrupted_tool_calls(session: Session) -> Session:
+        repaired = []
+        changed = False
+        index = 0
+        while index < len(session.messages):
+            message = session.messages[index]
+            repaired.append(message)
+            index += 1
+            if not isinstance(message, AssistantMessage) or not message.tool_calls:
+                continue
+
+            resolved_call_ids = set()
+            while index < len(session.messages) and isinstance(
+                session.messages[index],
+                ToolResult,
+            ):
+                result = session.messages[index]
+                repaired.append(result)
+                resolved_call_ids.add(result.tool_call_id)
+                index += 1
+
+            for call in message.tool_calls:
+                if call.id in resolved_call_ids:
+                    continue
+                repaired.append(
+                    ToolResult.create(
+                        call.id,
+                        "Tool call was interrupted before completion.",
+                        is_error=True,
+                    )
+                )
+                changed = True
+
+        if not changed:
+            return session
+        return replace(
+            session,
+            messages=tuple(repaired),
+            updated_at=now(),
+        )

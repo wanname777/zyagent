@@ -119,6 +119,21 @@ class WebServerTests(unittest.TestCase):
         self.assertEqual(payload["session"]["active_message_count"], 2)
         self.assertEqual(payload["session"]["message_count"], 4)
 
+    def test_resumes_a_session_with_an_unanswered_user_message(self) -> None:
+        session = self.service.create_session("resume-me")
+        self.store.save(session.append(UserMessage.create("please continue")))
+        self.model.responses.append(assistant("continued"))
+
+        status, payload = self.request(
+            "POST",
+            "/api/sessions/resume-me/resume",
+            {},
+        )
+
+        self.assertEqual(status, 200)
+        self.assertEqual(payload["response"]["text"], "continued")
+        self.assertEqual(payload["session"]["message_count"], 2)
+
     def test_serves_application_shell_and_health_metadata(self) -> None:
         with urllib.request.urlopen(self.base_url + "/", timeout=3) as response:
             html = response.read().decode("utf-8")

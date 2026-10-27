@@ -714,6 +714,30 @@ button:disabled {
   animation: spin 900ms steps(8) infinite;
 }
 
+.resume-panel {
+  display: flex;
+  max-width: 900px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 0 auto 18px;
+  padding: 11px 13px;
+  color: var(--ink);
+  background: var(--surface-raised);
+  border: 3px solid var(--accent-strong);
+  box-shadow: 4px 4px 0 var(--shadow);
+}
+
+.resume-panel > div {
+  display: grid;
+  min-width: 0;
+}
+
+.resume-panel span {
+  color: var(--ink-muted);
+  font-size: 11px;
+}
+
 .empty-state {
   display: grid;
   min-height: 100%;
@@ -1195,6 +1219,11 @@ input[type="range"] {
 
   .farm-scene {
     transform: scale(0.86);
+  }
+
+  .resume-panel {
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .toast-region {

@@ -16,7 +16,7 @@ from .serializers import message_payload, session_payload
 
 _SESSION_ROUTE = re.compile(
     r"^/api/sessions/(?P<session_id>[^/]+)"
-    r"(?P<action>/messages|/branches|/compress)?$"
+    r"(?P<action>/messages|/branches|/compress|/resume)?$"
 )
 _MAX_BODY_BYTES = 1_000_000
 
@@ -103,6 +103,8 @@ class ZyagentRequestHandler(BaseHTTPRequestHandler):
             )
         elif action == "/compress":
             self._handle_api(lambda: self._compress_session(session_id))
+        elif action == "/resume":
+            self._handle_api(lambda: self._resume_session(session_id))
 
     def log_message(self, format: str, *args: object) -> None:
         return
@@ -149,6 +151,14 @@ class ZyagentRequestHandler(BaseHTTPRequestHandler):
             raise ValueError("keep_recent must be an integer")
         session = self.server.service.compress_session(session_id, keep_recent)
         return {"session": session_payload(session)}
+
+    def _resume_session(self, session_id: str) -> Dict[str, Any]:
+        response = self.server.service.resume_session(session_id)
+        session = self.server.service.get_session(session_id)
+        return {
+            "response": message_payload(response),
+            "session": session_payload(session),
+        }
 
     def _handle_api(
         self,

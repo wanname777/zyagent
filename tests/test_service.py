@@ -14,6 +14,7 @@ from zyagent.application.ports import Effort, ModelSettings
 from zyagent.application.service import AgentService
 from zyagent.domain.messages import AssistantMessage, ToolCall, ToolResult, UserMessage
 from zyagent.domain.roles import Assistant, ToolCallReviewer
+from zyagent.domain.session import Session
 
 
 class AgentServiceTests(unittest.TestCase):
@@ -97,6 +98,70 @@ class AgentServiceTests(unittest.TestCase):
             [type(message) for message in reviewer_context.messages],
             [UserMessage],
         )
+
+    def test_multiple_tool_calls_use_same_valid_reviewer_history(self) -> None:
+        first = ToolCall.create("echo", {"text": "one"})
+        second = ToolCall.create("echo", {"text": "two"})
+        model = QueueModelClient(
+            AssistantMessage.create(tool_calls=(first, second)),
+            allow(),
+            allow(),
+            assistant("finished"),
+        )
+        service = self.service(model)
+        session = service.create_session("session")
+
+        service.send_message(session.id, "echo twice")
+        saved = self.store.load(session.id)
+
+        self.assertEqual(
+            [type(message) for message in saved.messages],
+            [
+                UserMessage,
+                AssistantMessage,
+                ToolResult,
+                ToolResult,
+                AssistantMessage,
+            ],
+        )
+        self.assertEqual(model.contexts[1].messages, model.contexts[2].messages)
+        self.assertEqual(
+            [type(message) for message in model.contexts[2].messages],
+            [UserMessage],
+        )
+
+    def test_resume_repairs_interrupted_tool_calls_before_model_request(self) -> None:
+        first = ToolCall.create("echo", {"text": "one"})
+        second = ToolCall.create("echo", {"text": "two"})
+        interrupted = (
+            Session.create("session")
+            .append(UserMessage.create("start"))
+            .append(AssistantMessage.create(tool_calls=(first, second)))
+            .append(ToolResult.create(first.id, "one"))
+            .append(UserMessage.create("retry"))
+        )
+        self.store.save(interrupted)
+        model = QueueModelClient(assistant("recovered"))
+        service = self.service(model)
+
+        response = service.resume_session(interrupted.id)
+        saved = self.store.load(interrupted.id)
+
+        self.assertEqual(response.text, "recovered")
+        self.assertEqual(
+            [type(message) for message in saved.messages],
+            [
+                UserMessage,
+                AssistantMessage,
+                ToolResult,
+                ToolResult,
+                UserMessage,
+                AssistantMessage,
+            ],
+        )
+        repaired_result = saved.messages[3]
+        self.assertTrue(repaired_result.is_error)
+        self.assertEqual(repaired_result.tool_call_id, second.id)
 
     def test_branch_session_is_independent_from_parent(self) -> None:
         model = QueueModelClient(assistant("parent answer"))

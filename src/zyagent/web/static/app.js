@@ -269,6 +269,9 @@ function renderMessages(session, optimisticText = "") {
     }
     elements.messages.append(renderMessage(message, results));
   }
+  if (sessionNeedsResume(session)) {
+    elements.messages.append(renderResumePanel());
+  }
   if (optimisticText) {
     elements.messages.append(
       renderMessage({
@@ -377,6 +380,39 @@ function renderLoadingMessage() {
   return article;
 }
 
+function renderResumePanel() {
+  const panel = document.createElement("div");
+  panel.className = "resume-panel";
+  const copy = document.createElement("div");
+  const title = document.createElement("strong");
+  title.textContent = "这封信还没有回音";
+  const detail = document.createElement("span");
+  detail.textContent = "上一轮调用中断，可以从保存的位置继续。";
+  copy.append(title, detail);
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "primary-button";
+  button.append(createIcon("refresh-cw"), document.createTextNode("继续回复"));
+  button.addEventListener("click", resumeSession);
+  panel.append(copy, button);
+  return panel;
+}
+
+function sessionNeedsResume(session) {
+  const lastMessage = session.messages.at(-1);
+  return Boolean(
+    lastMessage
+      && (
+        lastMessage.type === "user"
+        || lastMessage.type === "tool_result"
+        || (
+          lastMessage.type === "assistant"
+          && lastMessage.tool_calls?.length
+        )
+      ),
+  );
+}
+
 function appendRichText(container, value) {
   const codePattern = /```([^\n]*)\n?([\s\S]*?)```/g;
   let cursor = 0;
@@ -480,11 +516,52 @@ async function sendMessage(event) {
     await refreshSessions(false);
     renderCurrentSession();
   } catch (error) {
+    try {
+      const latest = await api(
+        `/api/sessions/${encodeURIComponent(state.current.id)}`,
+      );
+      state.current = latest.session;
+      await refreshSessions(false);
+    } catch {
+      // Keep the last rendered state when the local server is unavailable.
+    }
     renderCurrentSession();
     showToast(error.message, true);
   } finally {
     setBusy(false);
     elements.messageInput.focus();
+  }
+}
+
+async function resumeSession() {
+  if (!state.current || state.busy) {
+    return;
+  }
+  setBusy(true);
+  renderMessages(state.current);
+  elements.messages.append(renderLoadingMessage());
+  elements.messages.scrollTop = elements.messages.scrollHeight;
+  try {
+    const payload = await api(
+      `/api/sessions/${encodeURIComponent(state.current.id)}/resume`,
+      {
+        method: "POST",
+        body: "{}",
+      },
+    );
+    state.current = payload.session;
+    await refreshSessions(false);
+    renderCurrentSession();
+    showToast("已经从中断处继续");
+  } catch (error) {
+    const latest = await api(
+      `/api/sessions/${encodeURIComponent(state.current.id)}`,
+    );
+    state.current = latest.session;
+    renderCurrentSession();
+    showToast(error.message, true);
+  } finally {
+    setBusy(false);
   }
 }
 
