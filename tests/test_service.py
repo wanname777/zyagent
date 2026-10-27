@@ -80,6 +80,24 @@ class AgentServiceTests(unittest.TestCase):
         self.assertTrue(result.is_error)
         self.assertEqual(result.content, "policy denied")
 
+    def test_reviewer_context_excludes_pending_assistant_tool_call(self) -> None:
+        call = ToolCall.create("echo", {"text": "done"})
+        model = QueueModelClient(
+            AssistantMessage.create(tool_calls=(call,)),
+            allow(),
+            assistant("done"),
+        )
+        service = self.service(model)
+        session = service.create_session("session")
+
+        service.send_message(session.id, "echo done")
+
+        reviewer_context = model.contexts[1]
+        self.assertEqual(
+            [type(message) for message in reviewer_context.messages],
+            [UserMessage],
+        )
+
     def test_branch_session_is_independent_from_parent(self) -> None:
         model = QueueModelClient(assistant("parent answer"))
         service = self.service(model)

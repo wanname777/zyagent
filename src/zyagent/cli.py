@@ -63,6 +63,15 @@ def parser() -> argparse.ArgumentParser:
     )
     compress.add_argument("session")
     compress.add_argument("--keep-recent", type=int, default=12)
+
+    web = subcommands.add_parser("web", help="Start the local web interface.")
+    web.add_argument("--host", default="127.0.0.1")
+    web.add_argument("--port", type=int, default=8765)
+    web.add_argument(
+        "--no-open",
+        action="store_true",
+        help="Do not open the interface in the default browser.",
+    )
     return command
 
 
@@ -114,6 +123,16 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             return 0
         if args.command == "chat":
             return _chat(service, args.session, " ".join(args.prompt).strip())
+        if args.command == "web":
+            from zyagent.web.server import run_web_server
+
+            run_web_server(
+                service,
+                host=args.host,
+                port=args.port,
+                open_browser=not args.no_open,
+            )
+            return 0
     except (SessionNotFoundError, ValueError, RuntimeError) as error:
         print(f"error: {error}", file=sys.stderr)
         return 2

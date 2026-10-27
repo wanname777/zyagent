@@ -13,6 +13,7 @@
 - OpenAI 兼容模型协议，可通过 `OPENAI_BASE_URL` 接入兼容服务
 - 独立的主模型、工具审核模型和压缩模型配置
 - 带最大迭代次数的工具调用循环
+- 本地像素农场风 Web UI，支持可扩展主题
 - JSONL 会话存储，写入使用临时文件原子替换
 - 只读 Bash、工作区文件读取和原子写入工具
 - 模型审核加本地确定性校验的双层工具安全
@@ -36,6 +37,9 @@ src/zyagent/
 │   ├── models/openai.py    # OpenAI 兼容协议
 │   ├── stores/jsonl.py     # JSONL 持久化
 │   └── tools/              # Bash 与文件工具
+├── web/
+│   ├── server.py           # 本地 HTTP API 与静态资源服务
+│   └── static/             # 主题化 Web UI
 ├── main.py                 # 组装根
 └── cli.py                  # 命令行入口
 ```
@@ -102,6 +106,16 @@ zyagent chat
 zyagent chat "检查当前工作区并概括项目结构"
 zyagent chat --session SESSION_ID "继续刚才的任务"
 ```
+
+启动本地 Web UI：
+
+```bash
+zyagent web
+```
+
+默认打开 `http://127.0.0.1:8765`。使用 `zyagent web --no-open` 可只启动
+服务，使用 `--port` 可修改端口。Web UI 与 CLI 共用同一份会话数据，支持
+新建和继续会话、消息级分支、上下文压缩、工具执行结果查看与主题切换。
 
 会话默认保存在 `~/.zyagent/sessions.jsonl`。可通过 `--data-path` 修改，
 工具工作区默认是当前目录，可通过 `--workspace` 指定。

@@ -1,0 +1,71 @@
+:root,
+:root[data-theme="harvest"] {
+  --sky: #82c9de;
+  --sky-detail: #54a9c5;
+  --cloud: #f7fff1;
+  --hill-back: #4e9b62;
+  --hill-front: #2f7652;
+  --grass: #74a94d;
+  --grass-light: #a5c95d;
+  --soil: #9a5b43;
+  --soil-dark: #653d35;
+  --sun: #f5c94c;
+  --frame: #254f3b;
+  --frame-strong: #17382b;
+  --surface: #fffdf0;
+  --surface-raised: #e9f4d9;
+  --surface-muted: #cee4c4;
+  --surface-code: #203a32;
+  --ink: #24382f;
+  --ink-muted: #607467;
+  --ink-inverse: #fffdf0;
+  --selected-ink: #17382b;
+  --sidebar-muted: #cee4c4;
+  --accent: #e0af3e;
+  --accent-strong: #bd643f;
+  --accent-green: #4e8a48;
+  --water: #2f87a7;
+  --user-bubble: #dff0a2;
+  --assistant-bubble: #fff9da;
+  --tool-bubble: #dcebd6;
+  --danger: #a83e3c;
+  --shadow: #17382b;
+  --focus: #e15241;
+  --overlay: rgb(20 43 34 / 62%);
+}
+
+:root[data-theme="moonlit"] {
+  color-scheme: dark;
+  --sky: #34466f;
+  --sky-detail: #243452;
+  --cloud: #c8d9d2;
+  --hill-back: #3f6b65;
+  --hill-front: #244d47;
+  --grass: #47785a;
+  --grass-light: #6f9c62;
+  --soil: #725347;
+  --soil-dark: #3d3437;
+  --sun: #f0dc86;
+  --frame: #172f32;
+  --frame-strong: #0d2226;
+  --surface: #233c3c;
+  --surface-raised: #2d4b46;
+  --surface-muted: #36584f;
+  --surface-code: #102526;
+  --ink: #f2f0cf;
+  --ink-muted: #b6c7ae;
+  --ink-inverse: #f7f3d7;
+  --selected-ink: #f2f0cf;
+  --sidebar-muted: #a9c4b3;
+  --accent: #e4c65b;
+  --accent-strong: #d67562;
+  --accent-green: #7caf66;
+  --water: #69a9b9;
+  --user-bubble: #405f4e;
+  --assistant-bubble: #30494a;
+  --tool-bubble: #29413d;
+  --danger: #df7771;
+  --shadow: #0d2226;
+  --focus: #f0cf65;
+  --overlay: rgb(5 20 22 / 72%);
+}

@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="harvest">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <title>zyagent 农场信箱</title>
+    <link rel="stylesheet" href="/styles/base.css">
+    <link rel="stylesheet" href="/styles/themes.css">
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <div class="skyline" aria-hidden="true">
+      <span class="pixel-sun"></span>
+      <span class="pixel-cloud pixel-cloud--one"></span>
+      <span class="pixel-cloud pixel-cloud--two"></span>
+      <span class="distant-hill distant-hill--one"></span>
+      <span class="distant-hill distant-hill--two"></span>
+    </div>
+
+    <div id="app" class="app-frame">
+      <div id="sidebar-overlay" class="sidebar-overlay" hidden></div>
+
+      <aside id="sidebar" class="sidebar" aria-label="会话导航">
+        <header class="brand-bar">
+          <div class="brand-mark" aria-hidden="true">
+            <svg class="icon icon--brand"><use href="/icons.svg#sprout"></use></svg>
+          </div>
+          <div class="brand-copy">
+            <strong>ZY FARM</strong>
+            <span>农场信箱</span>
+          </div>
+          <button id="close-sidebar" class="icon-button mobile-only" type="button"
+            title="关闭会话栏" aria-label="关闭会话栏">
+            <svg class="icon"><use href="/icons.svg#panel-left-close"></use></svg>
+          </button>
+        </header>
+
+        <button id="new-session" class="new-session-button" type="button">
+          <svg class="icon"><use href="/icons.svg#plus"></use></svg>
+          <span>新建一页日志</span>
+        </button>
+
+        <div class="section-label">
+          <span>农场日志</span>
+          <span id="session-count" class="count-chip">0</span>
+        </div>
+        <nav id="session-list" class="session-list" aria-label="历史会话"></nav>
+
+        <footer class="sidebar-footer">
+          <div class="connection-row">
+            <span id="connection-light" class="connection-light" aria-hidden="true"></span>
+            <div>
+              <strong id="connection-label">正在连接</strong>
+              <span id="model-label">模型未就绪</span>
+            </div>
+          </div>
+          <button id="open-theme" class="icon-button" type="button"
+            title="切换农场主题" aria-label="切换农场主题">
+            <svg class="icon"><use href="/icons.svg#palette"></use></svg>
+          </button>
+        </footer>
+      </aside>
+
+      <main class="workspace">
+        <header class="workspace-header">
+          <button id="open-sidebar" class="icon-button mobile-only" type="button"
+            title="打开会话栏" aria-label="打开会话栏">
+            <svg class="icon"><use href="/icons.svg#menu"></use></svg>
+          </button>
+          <div class="conversation-heading">
+            <span class="eyebrow">今日信箱</span>
+            <h1 id="conversation-title">新会话</h1>
+          </div>
+          <div class="header-stats" aria-label="会话统计">
+            <span id="active-count">0 活跃</span>
+            <span id="total-count">0 总计</span>
+          </div>
+          <div class="header-actions">
+            <button id="refresh-session" class="icon-button" type="button"
+              title="刷新会话" aria-label="刷新会话">
+              <svg class="icon"><use href="/icons.svg#refresh-cw"></use></svg>
+            </button>
+            <button id="open-compress" class="icon-button" type="button"
+              title="压缩会话记忆" aria-label="压缩会话记忆" disabled>
+              <svg class="icon"><use href="/icons.svg#archive"></use></svg>
+            </button>
+          </div>
+        </header>
+
+        <section id="summary-banner" class="summary-banner" hidden>
+          <svg class="icon"><use href="/icons.svg#wheat"></use></svg>
+          <div>
+            <strong>记忆粮仓</strong>
+            <p id="summary-text"></p>
+          </div>
+          <button id="toggle-summary" class="icon-button icon-button--quiet" type="button"
+            title="展开或收起摘要" aria-label="展开或收起摘要">
+            <svg class="icon"><use href="/icons.svg#chevron-down"></use></svg>
+          </button>
+        </section>
+
+        <section id="messages" class="messages" aria-live="polite">
+          <div id="empty-state" class="empty-state">
+            <div class="farm-scene" aria-hidden="true">
+              <span class="farm-ground"></span>
+              <span class="farm-house"></span>
+              <span class="farm-roof"></span>
+              <span class="farm-door"></span>
+              <span class="farm-window"></span>
+              <span class="farm-tree-trunk"></span>
+              <span class="farm-tree-crown"></span>
+              <span class="farm-crops farm-crops--one"></span>
+              <span class="farm-crops farm-crops--two"></span>
+              <span class="farm-crops farm-crops--three"></span>
+            </div>
+            <h2>今天想种下什么想法？</h2>
+            <p>写下一封信，zyagent 会从这里开始。</p>
+          </div>
+        </section>
+
+        <form id="composer" class="composer">
+          <div class="composer-field">
+            <textarea id="message-input" rows="1" maxlength="12000"
+              placeholder="写信给 zyagent…" aria-label="发送消息"></textarea>
+            <span id="composer-hint" class="composer-hint">Enter 发送 · Shift+Enter 换行</span>
+          </div>
+          <button id="send-message" class="send-button" type="submit"
+            title="发送消息" aria-label="发送消息">
+            <svg class="icon"><use href="/icons.svg#send"></use></svg>
+          </button>
+        </form>
+      </main>
+    </div>
+
+    <dialog id="compress-dialog" class="pixel-dialog">
+      <form id="compress-form" method="dialog">
+        <header class="dialog-header">
+          <div>
+            <span class="eyebrow">整理粮仓</span>
+            <h2>压缩会话记忆</h2>
+          </div>
+          <button class="icon-button dialog-close" type="button"
+            title="关闭" aria-label="关闭压缩窗口">
+            <svg class="icon"><use href="/icons.svg#x"></use></svg>
+          </button>
+        </header>
+        <label class="range-label" for="keep-recent">
+          <span>保留最近消息</span>
+          <output id="keep-recent-value">12</output>
+        </label>
+        <input id="keep-recent" type="range" min="1" max="12" value="12">
+        <div class="dialog-actions">
+          <button class="secondary-button dialog-cancel" type="button">取消</button>
+          <button id="confirm-compress" class="primary-button" type="submit">
+            <svg class="icon"><use href="/icons.svg#archive"></use></svg>
+            <span>开始整理</span>
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="theme-dialog" class="pixel-dialog pixel-dialog--small">
+      <form method="dialog">
+        <header class="dialog-header">
+          <div>
+            <span class="eyebrow">衣柜</span>
+            <h2>选择农场外观</h2>
+          </div>
+          <button class="icon-button dialog-close" type="button"
+            title="关闭" aria-label="关闭主题窗口">
+            <svg class="icon"><use href="/icons.svg#x"></use></svg>
+          </button>
+        </header>
+        <div id="theme-options" class="theme-options" role="radiogroup"
+          aria-label="界面主题">
+          <button type="button" class="theme-option" data-theme-value="harvest"
+            role="radio" aria-checked="true">
+            <span class="theme-swatch theme-swatch--harvest" aria-hidden="true"></span>
+            <span><strong>丰收谷</strong><small>晴日 · 木屋 · 麦田</small></span>
+            <svg class="icon theme-check"><use href="/icons.svg#check"></use></svg>
+          </button>
+          <button type="button" class="theme-option" data-theme-value="moonlit"
+            role="radio" aria-checked="false">
+            <span class="theme-swatch theme-swatch--moonlit" aria-hidden="true"></span>
+            <span><strong>星夜农场</strong><small>月光 · 萤火 · 深林</small></span>
+            <svg class="icon theme-check"><use href="/icons.svg#check"></use></svg>
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <div id="toast-region" class="toast-region" aria-live="assertive"></div>
+  </body>
+</html>

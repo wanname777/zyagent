@@ -30,6 +30,13 @@ class ToolCallReviewer:
     instruction: str
 
     def context(self, session: Session, call: ToolCall) -> Context[Decision]:
+        messages = session.context_messages()
+        if (
+            messages
+            and isinstance(messages[-1], AssistantMessage)
+            and any(item.id == call.id for item in messages[-1].tool_calls)
+        ):
+            messages = messages[:-1]
         subject = json.dumps(
             {"id": call.id, "name": call.name, "arguments": call.arguments},
             ensure_ascii=False,
@@ -42,7 +49,7 @@ class ToolCallReviewer:
                 f"Tool call under review: {subject}"
             ),
             tools=(),
-            messages=session.context_messages(),
+            messages=messages,
             output_type=Decision,
             summary=session.summary,
         )
