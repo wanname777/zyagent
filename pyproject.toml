@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "zyagent"
-version = "0.2.0"
+version = "0.2.1"
 description = "A small, clean-architecture agent with safe tools, conversation branching, and context compression."
 readme = "README.md"
 requires-python = ">=3.9"
@@ -32,3 +32,4 @@ line-length = 88
 [tool.ruff.lint]
 select = ["E4", "E7", "E9", "F", "I", "B", "RUF"]
 ignore = ["RUF012"]
+allowed-confusables = ["：", "，", "；"]

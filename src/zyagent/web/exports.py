@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import html
+import os
 import re
 from typing import List
 
@@ -26,6 +27,15 @@ def session_markdown(session: Session) -> str:
         f"- Messages: {len(session.messages)}",
         "",
     ]
+    research = session_payload(session, include_messages=False).get("research")
+    if research:
+        lines.extend(
+            [
+                f"> 证据状态：{research['label']}",
+                f"> {research['evidence_count']} 条公开信号。{research['note']}",
+                "",
+            ]
+        )
     if session.summary:
         lines.extend(["## 记忆摘要", "", session.summary, ""])
 
@@ -67,12 +77,20 @@ def session_markdown(session: Session) -> str:
             "",
         ]
     )
-    return "\n".join(lines)
+    return _redact("\n".join(lines))
 
 
 def session_html(session: Session) -> str:
     title = str(session_payload(session, include_messages=False)["title"])
     sections: List[str] = []
+    research = session_payload(session, include_messages=False).get("research")
+    if research:
+        sections.append(
+            '<section class="summary"><h2>证据状态：'
+            f"{html.escape(research['label'])}</h2>"
+            f"<p>{research['evidence_count']} 条公开信号。"
+            f"{html.escape(research['note'])}</p></section>"
+        )
     if session.summary:
         sections.append(
             '<section class="summary"><h2>记忆摘要</h2>'
@@ -107,7 +125,7 @@ def session_html(session: Session) -> str:
                 f"<pre>{html.escape(message.content)}</pre></section>"
             )
 
-    return f"""<!doctype html>
+    return _redact(f"""<!doctype html>
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
@@ -161,11 +179,26 @@ def session_html(session: Session) -> str:
 </main>
 </body>
 </html>
-"""
+""")
 
 
 def _text_html(value: str) -> str:
     return html.escape(value).replace("\n", "<br>")
+
+
+def _redact(value: str) -> str:
+    for name in ("OPENAI_API_KEY", "GITHUB_TOKEN", "SCRAPECREATORS_API_KEY"):
+        secret = os.getenv(name)
+        if secret and len(secret) >= 8:
+            value = value.replace(secret, "[REDACTED]")
+            value = value.replace(html.escape(secret), "[REDACTED]")
+    value = re.sub(r"\bsk-[A-Za-z0-9_-]{16,}\b", "[REDACTED]", value)
+    value = re.sub(r"""file://[^\s"'<>`]+""", "[LOCAL_PATH]", value)
+    return re.sub(
+        r"""(?<![\w:/])/(?:Users|home|tmp|private|var|Volumes|etc)/[^\s"'<>`]+""",
+        "[LOCAL_PATH]",
+        value,
+    )
 
 
 def _pretty_json(value: object) -> str:

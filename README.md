@@ -137,6 +137,13 @@ Hacker News、GitHub Issue 和 Google News 中寻找公开证据，再输出：
 [`docs/sample-demand-report.html`](docs/sample-demand-report.html)，市场研究和
 产品决策见 [`docs/market-research-2026-10.md`](docs/market-research-2026-10.md)。
 
+报告顶部会显示证据状态：未验证草稿、报告未完成、采集失败、证据不足、
+部分来源失败或已采集公开信号。没有采集结果的模型回答仍是草稿，导出也会
+保留该标记。公开信号和关键词标签不代表真实购买意愿，报价需要访谈和预售验证。
+
+HTML 和 Markdown 导出会隐藏当前环境中配置的模型、GitHub 和 ScrapeCreators
+密钥，以及常见 Unix 本地绝对路径。分享前仍应检查对话中的其他私人信息。
+
 会话默认保存在 `~/.zyagent/sessions.jsonl`。可通过 `--data-path` 修改，
 工具工作区默认是当前目录，可通过 `--workspace` 指定。
 

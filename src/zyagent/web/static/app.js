@@ -26,6 +26,9 @@ const elements = {
   refreshSession: document.querySelector("#refresh-session"),
   openExport: document.querySelector("#open-export"),
   openCompress: document.querySelector("#open-compress"),
+  researchBanner: document.querySelector("#research-banner"),
+  researchLabel: document.querySelector("#research-label"),
+  researchDetail: document.querySelector("#research-detail"),
   summaryBanner: document.querySelector("#summary-banner"),
   summaryText: document.querySelector("#summary-text"),
   toggleSummary: document.querySelector("#toggle-summary"),
@@ -48,6 +51,7 @@ const elements = {
   revenueAudience: document.querySelector("#revenue-audience"),
   revenueObjectives: document.querySelector("#revenue-objectives"),
   exportDialog: document.querySelector("#export-dialog"),
+  exportStatus: document.querySelector("#export-status"),
   toastRegion: document.querySelector("#toast-region"),
 };
 
@@ -124,7 +128,14 @@ function bindEvents() {
     elements.summaryBanner.classList.toggle("is-expanded");
   });
   elements.openTheme.addEventListener("click", () => elements.themeDialog.showModal());
-  elements.openExport.addEventListener("click", () => elements.exportDialog.showModal());
+  elements.openExport.addEventListener("click", () => {
+    const research = state.current?.research;
+    elements.exportStatus.hidden = !research;
+    elements.exportStatus.textContent = research
+      ? `${research.label}。导出会保留此状态与覆盖说明。`
+      : "";
+    elements.exportDialog.showModal();
+  });
   elements.exportDialog.addEventListener("click", exportCurrentSession);
   elements.themeOptions.addEventListener("click", (event) => {
     const option = event.target.closest("[data-theme-value]");
@@ -242,6 +253,7 @@ function renderCurrentSession() {
     elements.totalCount.textContent = "0 总计";
     elements.openCompress.disabled = true;
     elements.openExport.disabled = true;
+    elements.researchBanner.hidden = true;
     elements.summaryBanner.hidden = true;
     elements.messages.replaceChildren(elements.emptyState);
     elements.emptyState.hidden = false;
@@ -253,6 +265,12 @@ function renderCurrentSession() {
   elements.totalCount.textContent = `${session.message_count} 总计`;
   elements.openCompress.disabled = session.active_message_count <= 1 || state.busy;
   elements.openExport.disabled = false;
+  elements.researchBanner.hidden = !session.research;
+  if (session.research) {
+    elements.researchLabel.textContent = session.research.label;
+    elements.researchDetail.textContent =
+      `${session.research.evidence_count} 条公开信号。${session.research.note}`;
+  }
   renderSummary(session);
   renderMessages(session);
 }
@@ -601,6 +619,7 @@ async function runRevenueMission(event) {
   ].join("\n");
 
   elements.revenueDialog.close();
+  setSidebar(false);
   setBusy(true);
   try {
     const created = await api("/api/sessions", {
@@ -626,7 +645,11 @@ async function runRevenueMission(event) {
       .forEach((item, index) => {
         item.setAttribute("aria-checked", String(index === 0));
       });
-    showToast("需求报告已经成熟");
+    const research = state.current.research;
+    showToast(
+      research?.label || "报告已生成",
+      Boolean(research && !research.ready),
+    );
   } catch (error) {
     if (state.current) {
       try {
@@ -658,7 +681,11 @@ function exportCurrentSession(event) {
   link.click();
   link.remove();
   elements.exportDialog.close();
-  showToast(format === "html" ? "HTML 报告已装箱" : "Markdown 已装箱");
+  showToast(
+    state.current.research && !state.current.research.ready
+      ? "已导出草稿，证据状态已保留"
+      : (format === "html" ? "HTML 报告已装箱" : "Markdown 已装箱"),
+  );
 }
 
 async function resumeSession() {
