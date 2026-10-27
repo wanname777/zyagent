@@ -83,12 +83,17 @@ python -m pip install -e .
 配置模型：
 
 ```bash
-export OPENAI_API_KEY="your-api-key"
-export OPENAI_BASE_URL="https://api.openai.com/v1"
-export ZYAGENT_MODEL="gpt-4.1-mini"
-export ZYAGENT_REVIEWER_MODEL="gpt-4.1-mini"
-export ZYAGENT_COMPRESSION_MODEL="gpt-4.1-mini"
+cat > .env <<'EOF'
+OPENAI_API_KEY="your-api-key"
+OPENAI_BASE_URL="https://api.openai.com/v1"
+ZYAGENT_MODEL="gpt-4.1-mini"
+EOF
+chmod 600 .env
 ```
+
+启动时会自动读取当前目录的 `.env`，但不会覆盖已经导出的环境变量。
+Reviewer 和压缩模型默认继承 `ZYAGENT_MODEL`，也可以分别通过
+`ZYAGENT_REVIEWER_MODEL` 和 `ZYAGENT_COMPRESSION_MODEL` 覆盖。
 
 开始对话：
 

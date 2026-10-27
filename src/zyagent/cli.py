@@ -7,11 +7,13 @@ from pathlib import Path
 from typing import Optional, Sequence
 
 from zyagent.application.service import SessionNotFoundError
+from zyagent.config import load_dotenv
 from zyagent.domain.messages import AssistantMessage, ToolResult, UserMessage
 from zyagent.main import AppConfig, build_service
 
 
 def parser() -> argparse.ArgumentParser:
+    default_model = os.getenv("ZYAGENT_MODEL", "gpt-4.1-mini")
     command = argparse.ArgumentParser(
         prog="zyagent",
         description="A clean-architecture agent with branching and context compression.",
@@ -30,15 +32,15 @@ def parser() -> argparse.ArgumentParser:
     )
     command.add_argument(
         "--model",
-        default=os.getenv("ZYAGENT_MODEL", "gpt-4.1-mini"),
+        default=default_model,
     )
     command.add_argument(
         "--reviewer-model",
-        default=os.getenv("ZYAGENT_REVIEWER_MODEL", "gpt-4.1-mini"),
+        default=os.getenv("ZYAGENT_REVIEWER_MODEL", default_model),
     )
     command.add_argument(
         "--compression-model",
-        default=os.getenv("ZYAGENT_COMPRESSION_MODEL", "gpt-4.1-mini"),
+        default=os.getenv("ZYAGENT_COMPRESSION_MODEL", default_model),
     )
 
     subcommands = command.add_subparsers(dest="command", required=True)
@@ -77,6 +79,7 @@ def config_from_args(args: argparse.Namespace) -> AppConfig:
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
+    load_dotenv(Path.cwd() / ".env")
     args = parser().parse_args(argv)
     service = build_service(config_from_args(args))
     try:
