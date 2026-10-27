@@ -2,6 +2,9 @@
 
 [![CI](https://github.com/wanname777/zyagent/actions/workflows/ci.yml/badge.svg)](https://github.com/wanname777/zyagent/actions/workflows/ci.yml)
 
+[Demand Farm 产品介绍](https://wanname777.github.io/zyagent/) ·
+[真实需求报告样例](https://wanname777.github.io/zyagent/sample-demand-report.html)
+
 `zyagent` 是一个小而完整的 Agent 后端。项目参考视频
 [《10 分钟学会设计 Agent 架构》](https://www.bilibili.com/video/BV1winH6DEgt/)
 的分层方法，从领域语言开始设计，再由应用层编排流程、适配层连接外部系统。
@@ -14,6 +17,7 @@
 - 独立的主模型、工具审核模型和压缩模型配置
 - 带最大迭代次数的工具调用循环
 - 本地像素农场风 Web UI，支持可扩展主题
+- “需求农场”收入实验室：公开市场信号、商业机会报告和可分享导出
 - JSONL 会话存储，写入使用临时文件原子替换
 - 只读 Bash、工作区文件读取和原子写入工具
 - 模型审核加本地确定性校验的双层工具安全
@@ -116,6 +120,22 @@ zyagent web
 默认打开 `http://127.0.0.1:8765`。使用 `zyagent web --no-open` 可只启动
 服务，使用 `--port` 可修改端口。Web UI 与 CLI 共用同一份会话数据，支持
 新建和继续会话、消息级分支、上下文压缩、工具执行结果查看与主题切换。
+
+### 需求农场
+
+在侧栏点击“收入实验室”，输入行业、产品想法和目标客户，选择需求验证、
+定价变现或内容获客。zyagent 会先调用 `market_signals`，从最近的
+Hacker News、GitHub Issue 和 Google News 中寻找公开证据，再输出：
+
+- 数据覆盖与限制
+- 高频痛点、购买信号和反信号
+- 最小可售卖方案
+- 价格实验和内容获客角度
+- 下一步访谈或预售动作
+
+当前会话可以导出为独立 HTML 或 Markdown。样例见
+[`docs/sample-demand-report.html`](docs/sample-demand-report.html)，市场研究和
+产品决策见 [`docs/market-research-2026-10.md`](docs/market-research-2026-10.md)。
 
 会话默认保存在 `~/.zyagent/sessions.jsonl`。可通过 `--data-path` 修改，
 工具工作区默认是当前目录，可通过 `--workspace` 指定。

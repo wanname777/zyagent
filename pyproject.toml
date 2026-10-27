@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "zyagent"
-version = "0.1.0"
+version = "0.2.0"
 description = "A small, clean-architecture agent with safe tools, conversation branching, and context compression."
 readme = "README.md"
 requires-python = ">=3.9"

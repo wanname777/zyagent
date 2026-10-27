@@ -8,16 +8,18 @@ from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any, Dict, Tuple
-from urllib.parse import unquote, urlparse
+from urllib.parse import parse_qs, unquote, urlparse
 
 from zyagent.application.service import AgentService, SessionNotFoundError
 
+from .exports import export_filename, session_html, session_markdown
 from .serializers import message_payload, session_payload
 
 _SESSION_ROUTE = re.compile(
     r"^/api/sessions/(?P<session_id>[^/]+)"
     r"(?P<action>/messages|/branches|/compress|/resume)?$"
 )
+_EXPORT_ROUTE = re.compile(r"^/api/sessions/(?P<session_id>[^/]+)/export$")
 _MAX_BODY_BYTES = 1_000_000
 
 
@@ -40,7 +42,8 @@ class ZyagentRequestHandler(BaseHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
 
     def do_GET(self) -> None:
-        path = urlparse(self.path).path
+        parsed_url = urlparse(self.path)
+        path = parsed_url.path
         if path == "/api/health":
             self._send_json(
                 HTTPStatus.OK,
@@ -56,6 +59,13 @@ class ZyagentRequestHandler(BaseHTTPRequestHandler):
                 for session in reversed(self.server.service.list_sessions())
             ]
             self._send_json(HTTPStatus.OK, {"sessions": sessions})
+            return
+        export_route = _EXPORT_ROUTE.fullmatch(path)
+        if export_route:
+            self._handle_export(
+                unquote(export_route.group("session_id")),
+                parse_qs(parsed_url.query).get("format", ["html"])[0],
+            )
             return
         route = _SESSION_ROUTE.fullmatch(path)
         if route and route.group("action") is None:
@@ -190,6 +200,38 @@ class ZyagentRequestHandler(BaseHTTPRequestHandler):
             return
         self._send_json(success, payload)
 
+    def _handle_export(self, session_id: str, export_format: str) -> None:
+        try:
+            session = self.server.service.get_session(session_id)
+        except SessionNotFoundError as error:
+            self._send_error(
+                HTTPStatus.NOT_FOUND,
+                "session_not_found",
+                str(error),
+            )
+            return
+        if export_format == "md":
+            body = session_markdown(session).encode("utf-8")
+            content_type = "text/markdown; charset=utf-8"
+            filename = export_filename(session, "md")
+        elif export_format == "html":
+            body = session_html(session).encode("utf-8")
+            content_type = "text/html; charset=utf-8"
+            filename = export_filename(session, "html")
+        else:
+            self._send_error(
+                HTTPStatus.BAD_REQUEST,
+                "invalid_request",
+                "format must be html or md",
+            )
+            return
+        self._send_bytes(
+            HTTPStatus.OK,
+            body,
+            content_type,
+            {"Content-Disposition": f'attachment; filename="{filename}"'},
+        )
+
     def _read_json(self) -> Dict[str, Any]:
         raw_length = self.headers.get("Content-Length", "0")
         try:
@@ -255,6 +297,7 @@ class ZyagentRequestHandler(BaseHTTPRequestHandler):
         status: HTTPStatus,
         body: bytes,
         content_type: str,
+        extra_headers: Dict[str, str] | None = None,
     ) -> None:
         self.send_response(status)
         self.send_header("Content-Type", content_type)
@@ -267,6 +310,8 @@ class ZyagentRequestHandler(BaseHTTPRequestHandler):
             "default-src 'self'; img-src 'self' data:; "
             "style-src 'self'; script-src 'self'; connect-src 'self'",
         )
+        for name, value in (extra_headers or {}).items():
+            self.send_header(name, value)
         self.end_headers()
         self.wfile.write(body)
 

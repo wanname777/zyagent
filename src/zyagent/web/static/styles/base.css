@@ -198,6 +198,7 @@ button:disabled {
 }
 
 .new-session-button,
+.revenue-lab-button,
 .primary-button,
 .secondary-button {
   display: inline-flex;
@@ -213,9 +214,20 @@ button:disabled {
 }
 
 .new-session-button {
-  margin: 14px;
+  margin: 14px 14px 8px;
   color: var(--frame-strong);
   background: var(--accent);
+}
+
+.revenue-lab-button {
+  margin: 0 14px 14px;
+  color: var(--ink-inverse);
+  background: var(--accent-strong);
+}
+
+.revenue-lab-button:hover {
+  color: var(--frame-strong);
+  background: var(--grass-light);
 }
 
 .new-session-button:hover,
@@ -954,6 +966,94 @@ button:disabled {
   padding: 18px;
 }
 
+.field-label {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 14px;
+  font-weight: 700;
+}
+
+.field-label input {
+  width: 100%;
+  min-height: 42px;
+  padding: 8px 10px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 3px solid var(--frame-strong);
+  border-radius: 2px;
+}
+
+.objective-fieldset {
+  margin: 4px 0 0;
+  padding: 0;
+  border: 0;
+}
+
+.objective-fieldset legend {
+  margin-bottom: 7px;
+  font-weight: 700;
+}
+
+.segmented-control {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border: 3px solid var(--frame-strong);
+}
+
+.segmented-control button {
+  min-width: 0;
+  min-height: 38px;
+  padding: 5px;
+  color: var(--ink);
+  background: var(--surface-raised);
+  border: 0;
+  border-right: 2px solid var(--frame-strong);
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.segmented-control button:last-child {
+  border-right: 0;
+}
+
+.segmented-control button[aria-checked="true"] {
+  color: var(--frame-strong);
+  background: var(--accent);
+  font-weight: 700;
+}
+
+.export-options {
+  display: grid;
+  gap: 10px;
+}
+
+.export-option {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  min-height: 62px;
+  padding: 9px;
+  color: var(--ink);
+  text-align: left;
+  background: var(--surface-raised);
+  border: 3px solid var(--frame-strong);
+  cursor: pointer;
+}
+
+.export-option:hover {
+  border-color: var(--accent-strong);
+  box-shadow: 3px 3px 0 var(--frame-strong);
+}
+
+.export-option > span {
+  display: grid;
+}
+
+.export-option small {
+  color: var(--ink-muted);
+}
+
 .dialog-header {
   display: flex;
   align-items: center;
@@ -1224,6 +1324,19 @@ input[type="range"] {
   .resume-panel {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .segmented-control {
+    grid-template-columns: 1fr;
+  }
+
+  .segmented-control button {
+    border-right: 0;
+    border-bottom: 2px solid var(--frame-strong);
+  }
+
+  .segmented-control button:last-child {
+    border-bottom: 0;
   }
 
   .toast-region {

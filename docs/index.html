@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Demand Farm by zyagent 从近期公开信号中发现真实痛点、购买意愿、定价实验和内容机会。">
+  <meta property="og:title" content="Demand Farm by zyagent">
+  <meta property="og:description" content="别再凭感觉做产品。先找到正在发生的需求和购买信号。">
+  <link rel="canonical" href="https://wanname777.github.io/zyagent/">
+  <title>Demand Farm by zyagent</title>
+  <style>
+    :root {
+      --sky: #82c9de;
+      --cloud: #f8fff0;
+      --grass: #70a64b;
+      --grass-light: #a5c95d;
+      --forest: #24533d;
+      --forest-dark: #17372a;
+      --paper: #fffdf0;
+      --yellow: #e5b743;
+      --red: #bd6042;
+      --blue: #2f87a7;
+      --ink: #21372e;
+      --muted: #607469;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font: 16px/1.65 "Courier New", "PingFang SC", monospace;
+      letter-spacing: 0;
+    }
+    a { color: inherit; }
+    .hero {
+      position: relative;
+      display: grid;
+      min-height: min(720px, 76vh);
+      overflow: hidden;
+      align-content: center;
+      padding: 50px max(24px, calc((100vw - 1120px) / 2));
+      color: var(--forest-dark);
+      background: var(--sky);
+      border-bottom: 6px solid var(--forest-dark);
+    }
+    .sun {
+      position: absolute;
+      top: 11%;
+      right: 11%;
+      width: 64px;
+      height: 64px;
+      background: var(--yellow);
+      box-shadow: -8px 8px 0 var(--yellow), 8px -8px 0 var(--yellow);
+    }
+    .cloud {
+      position: absolute;
+      top: 16%;
+      left: 11%;
+      width: 100px;
+      height: 24px;
+      background: var(--cloud);
+      box-shadow: 24px -16px 0 var(--cloud), 62px -8px 0 var(--cloud);
+      opacity: .9;
+    }
+    .field {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      height: 24%;
+      background: var(--grass);
+      border-top: 12px solid var(--grass-light);
+    }
+    .barn {
+      position: absolute;
+      right: 12%;
+      bottom: 17%;
+      width: 170px;
+      height: 116px;
+      background: var(--red);
+      border: 6px solid var(--forest-dark);
+      box-shadow: 10px 10px 0 var(--forest);
+    }
+    .barn::before {
+      position: absolute;
+      top: -64px;
+      left: -20px;
+      width: 200px;
+      height: 62px;
+      content: "";
+      background: #8f533d;
+      border: 6px solid var(--forest-dark);
+      clip-path: polygon(0 100%, 15% 100%, 15% 66%, 30% 66%, 30% 33%, 50% 0, 70% 33%, 70% 66%, 85% 66%, 85% 100%);
+    }
+    .barn::after {
+      position: absolute;
+      bottom: 0;
+      left: 58px;
+      width: 48px;
+      height: 74px;
+      content: "";
+      background: var(--forest-dark);
+      border: 5px solid var(--forest-dark);
+    }
+    .hero-copy { position: relative; z-index: 2; max-width: 760px; }
+    .kicker {
+      display: inline-block;
+      padding: 4px 9px;
+      color: var(--paper);
+      background: var(--forest);
+      border: 3px solid var(--forest-dark);
+      font-weight: 700;
+    }
+    h1 {
+      max-width: 740px;
+      margin: 18px 0 12px;
+      font-size: clamp(42px, 7vw, 82px);
+      line-height: 1.03;
+      text-wrap: balance;
+    }
+    .hero p { max-width: 650px; margin: 0 0 24px; font-size: clamp(17px, 2vw, 22px); }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; }
+    .button {
+      display: inline-flex;
+      min-height: 48px;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 17px;
+      text-decoration: none;
+      border: 4px solid var(--forest-dark);
+      box-shadow: 5px 5px 0 var(--forest-dark);
+      font-weight: 700;
+    }
+    .button-primary { background: var(--yellow); }
+    .button-secondary { color: var(--paper); background: var(--forest); }
+    .button:hover { transform: translate(2px, 2px); box-shadow: 3px 3px 0 var(--forest-dark); }
+    section { padding: 64px max(24px, calc((100vw - 1120px) / 2)); }
+    section h2 { max-width: 760px; margin: 0 0 14px; font-size: clamp(28px, 4vw, 46px); line-height: 1.15; }
+    .lead { max-width: 760px; margin: 0 0 34px; color: var(--muted); font-size: 18px; }
+    .problem { color: var(--paper); background: var(--forest); }
+    .problem .lead { color: #d9ead5; }
+    .signal-grid, .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .signal {
+      min-height: 190px;
+      padding: 20px;
+      color: var(--ink);
+      background: var(--paper);
+      border: 4px solid var(--forest-dark);
+      box-shadow: 6px 6px 0 var(--yellow);
+    }
+    .signal strong { display: block; margin-bottom: 8px; color: var(--red); font-size: 20px; }
+    .workflow { background: #e5f1d7; }
+    .steps { display: grid; gap: 0; max-width: 900px; border: 4px solid var(--forest-dark); }
+    .step { display: grid; grid-template-columns: 70px minmax(0,1fr); border-bottom: 3px solid var(--forest-dark); }
+    .step:last-child { border-bottom: 0; }
+    .step b { display: grid; place-items: center; color: var(--paper); background: var(--blue); font-size: 24px; }
+    .step div { padding: 16px; background: var(--paper); }
+    .pricing-grid { margin-top: 30px; }
+    .price {
+      padding: 22px;
+      border: 4px solid var(--forest-dark);
+      box-shadow: 6px 6px 0 var(--forest);
+    }
+    .price:nth-child(2) { background: #f8edb6; }
+    .price h3 { margin: 0; font-size: 24px; }
+    .amount { margin: 10px 0; color: var(--red); font-size: 34px; font-weight: 700; }
+    .price ul { padding-left: 20px; }
+    .sample {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(300px, .8fr);
+      gap: 30px;
+      align-items: center;
+      color: var(--paper);
+      background: var(--forest-dark);
+    }
+    .sample .lead { color: #c6dccb; }
+    .sample-window {
+      padding: 16px;
+      color: var(--ink);
+      background: var(--paper);
+      border: 5px solid var(--yellow);
+      box-shadow: 8px 8px 0 var(--red);
+    }
+    .sample-window b { color: var(--red); }
+    footer { padding: 30px 24px; color: var(--paper); text-align: center; background: #10291f; }
+    @media (max-width: 780px) {
+      .hero { min-height: 82vh; align-content: start; padding-top: 70px; }
+      .barn { right: 8%; transform: scale(.72); transform-origin: bottom right; }
+      .signal-grid, .pricing-grid, .sample { grid-template-columns: 1fr; }
+      .sample-window { order: -1; }
+    }
+    @media (max-height: 600px) {
+      .hero { min-height: 0; padding-top: 26px; padding-bottom: 34px; }
+      .hero h1 { margin-top: 12px; font-size: clamp(36px, 6vw, 58px); }
+      .hero p { margin-bottom: 16px; }
+      .barn { transform: scale(.72); transform-origin: bottom right; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <span class="sun" aria-hidden="true"></span>
+    <span class="cloud" aria-hidden="true"></span>
+    <span class="field" aria-hidden="true"></span>
+    <span class="barn" aria-hidden="true"></span>
+    <div class="hero-copy">
+      <span class="kicker">zyagent 的收入实验室</span>
+      <h1>别再凭感觉做产品。</h1>
+      <p>Demand Farm 从近期公开信号里找出真实痛点、购买意愿、定价实验和内容机会。证据不足时，它会直接告诉你。</p>
+      <div class="actions">
+        <a class="button button-primary" href="https://github.com/wanname777/zyagent">免费本地运行</a>
+        <a class="button button-secondary" href="sample-demand-report.html">查看真实样例</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="problem">
+    <h2>用户不为“Agent”付费，他们为结果付费。</h2>
+    <p class="lead">近期社区讨论集中在漏接询盘、报价、接待和跟进。通用聊天已经商品化，安装复杂、安全风险和无法证明 ROI 才是阻碍。</p>
+    <div class="signal-grid">
+      <div class="signal"><strong>需求证据</strong>近期讨论、Issue 和新闻，不把厂商宣传当成买方需求。</div>
+      <div class="signal"><strong>商业判断</strong>把痛点转成最小可售卖方案、价格实验和预售动作。</div>
+      <div class="signal"><strong>可追溯</strong>保留 URL、覆盖状态和失败来源，结论可以被检查。</div>
+    </div>
+  </section>
+
+  <section class="workflow">
+    <h2>从一个想法到可测试报价</h2>
+    <p class="lead">输入市场和目标客户，zyagent 调用公开信号工具，再生成一份可导出的商业机会报告。</p>
+    <div class="steps">
+      <div class="step"><b>01</b><div><strong>播种问题</strong><br>行业、产品、目标客户和验证目标。</div></div>
+      <div class="step"><b>02</b><div><strong>采集信号</strong><br>Hacker News、GitHub 和 Google News，最近 1 至 90 天。</div></div>
+      <div class="step"><b>03</b><div><strong>识别购买意愿</strong><br>痛点、价格、替代方案、反对意见和证据缺口。</div></div>
+      <div class="step"><b>04</b><div><strong>形成报价</strong><br>MVP、三个价格实验、内容角度和下一步预售动作。</div></div>
+      <div class="step"><b>05</b><div><strong>装箱分享</strong><br>导出独立 HTML 或 Markdown，继续访谈和成交。</div></div>
+    </div>
+  </section>
+
+  <section class="sample">
+    <div>
+      <h2>真实报告，不是漂亮幻觉。</h2>
+      <p class="lead">样例任务研究“面向本地服务商的 AI 接待”。公开结果缺少买方一手声音，Demand Farm 没有伪造信心，而是建议换成问题导向查询并先做访谈。</p>
+      <a class="button button-primary" href="sample-demand-report.html">打开完整样例</a>
+    </div>
+    <div class="sample-window">
+      <b>证据覆盖与限制</b>
+      <p>Google News 有结果，HN 与 GitHub 无结果。大部分内容来自供给方，不能证明牙科诊所有购买意愿。</p>
+      <b>下一步</b>
+      <p>先访谈单一行业，再用定金而不是口头“喜欢”验证需求。</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>先用服务赚第一笔，再把重复工作做成订阅。</h2>
+    <p class="lead">本地开源版是流量入口。托管、定时监控、多客户和白标报告才是长期付费边界。</p>
+    <div class="pricing-grid">
+      <div class="price">
+        <h3>Local</h3><div class="amount">免费</div>
+        <ul><li>本地 BYOK</li><li>手动需求研究</li><li>品牌报告导出</li></ul>
+        <a href="https://github.com/wanname777/zyagent">GitHub 获取</a>
+      </div>
+      <div class="price">
+        <h3>需求报告</h3><div class="amount">$99</div>
+        <ul><li>一个市场</li><li>证据与竞争空档</li><li>报价和预售动作</li></ul>
+        <a href="https://github.com/wanname777/zyagent/issues/new?template=demand-report.yml">申请一份报告</a>
+      </div>
+      <div class="price">
+        <h3>每周雷达</h3><div class="amount">$299/月</div>
+        <ul><li>每周更新</li><li>价格与竞争变化</li><li>内容选题包</li></ul>
+        <a href="https://github.com/wanname777/zyagent/issues/new?template=demand-report.yml">申请持续监控</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>Demand Farm by zyagent · Open-source core, evidence-first decisions.</footer>
+</body>
+</html>

@@ -40,6 +40,10 @@
           <svg class="icon"><use href="/icons.svg#plus"></use></svg>
           <span>新建一页日志</span>
         </button>
+        <button id="open-revenue-lab" class="revenue-lab-button" type="button">
+          <svg class="icon"><use href="/icons.svg#wheat"></use></svg>
+          <span>收入实验室</span>
+        </button>
 
         <div class="section-label">
           <span>农场日志</span>
@@ -77,6 +81,10 @@
             <span id="total-count">0 总计</span>
           </div>
           <div class="header-actions">
+            <button id="open-export" class="icon-button" type="button"
+              title="导出报告" aria-label="导出报告" disabled>
+              <svg class="icon"><use href="/icons.svg#file-text"></use></svg>
+            </button>
             <button id="refresh-session" class="icon-button" type="button"
               title="刷新会话" aria-label="刷新会话">
               <svg class="icon"><use href="/icons.svg#refresh-cw"></use></svg>
@@ -185,6 +193,74 @@
             <span class="theme-swatch theme-swatch--moonlit" aria-hidden="true"></span>
             <span><strong>星夜农场</strong><small>月光 · 萤火 · 深林</small></span>
             <svg class="icon theme-check"><use href="/icons.svg#check"></use></svg>
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="revenue-dialog" class="pixel-dialog">
+      <form id="revenue-form" method="dialog">
+        <header class="dialog-header">
+          <div>
+            <span class="eyebrow">收入实验室</span>
+            <h2>播种一个市场问题</h2>
+          </div>
+          <button class="icon-button dialog-close" type="button"
+            title="关闭" aria-label="关闭收入实验室">
+            <svg class="icon"><use href="/icons.svg#x"></use></svg>
+          </button>
+        </header>
+        <label class="field-label" for="revenue-topic">
+          <span>行业、产品或想法</span>
+          <input id="revenue-topic" name="topic" maxlength="180" required
+            placeholder="例如：面向牙科诊所的 AI 接待">
+        </label>
+        <label class="field-label" for="revenue-audience">
+          <span>目标客户</span>
+          <input id="revenue-audience" name="audience" maxlength="180"
+            placeholder="例如：10 人以内的本地诊所">
+        </label>
+        <fieldset class="objective-fieldset">
+          <legend>这次要收获什么</legend>
+          <div id="revenue-objectives" class="segmented-control" role="radiogroup">
+            <button type="button" role="radio" aria-checked="true"
+              data-objective="demand">需求验证</button>
+            <button type="button" role="radio" aria-checked="false"
+              data-objective="pricing">定价变现</button>
+            <button type="button" role="radio" aria-checked="false"
+              data-objective="content">内容获客</button>
+          </div>
+        </fieldset>
+        <div class="dialog-actions">
+          <button class="secondary-button dialog-cancel" type="button">取消</button>
+          <button id="run-revenue-lab" class="primary-button" type="submit">
+            <svg class="icon"><use href="/icons.svg#sprout"></use></svg>
+            <span>开始调研</span>
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="export-dialog" class="pixel-dialog pixel-dialog--small">
+      <form method="dialog">
+        <header class="dialog-header">
+          <div>
+            <span class="eyebrow">装箱</span>
+            <h2>导出当前报告</h2>
+          </div>
+          <button class="icon-button dialog-close" type="button"
+            title="关闭" aria-label="关闭导出窗口">
+            <svg class="icon"><use href="/icons.svg#x"></use></svg>
+          </button>
+        </header>
+        <div class="export-options">
+          <button type="button" class="export-option" data-export-format="html">
+            <svg class="icon"><use href="/icons.svg#file-text"></use></svg>
+            <span><strong>分享版 HTML</strong><small>独立页面，适合发送和发布</small></span>
+          </button>
+          <button type="button" class="export-option" data-export-format="md">
+            <svg class="icon"><use href="/icons.svg#file-text"></use></svg>
+            <span><strong>Markdown</strong><small>适合继续编辑和提交仓库</small></span>
           </button>
         </div>
       </form>

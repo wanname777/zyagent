@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>zyagent 需求农场 PRD</title>
+  <style>
+    :root {
+      --ink: #20362d;
+      --muted: #607468;
+      --paper: #fffdf0;
+      --mint: #dcebd6;
+      --green: #295b43;
+      --yellow: #e4b744;
+      --red: #bc6042;
+      --line: #183a2c;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: #82c9de;
+      font: 15px/1.65 "Courier New", "PingFang SC", monospace;
+    }
+    main {
+      width: min(1040px, calc(100% - 28px));
+      margin: 24px auto;
+      background: var(--paper);
+      border: 4px solid var(--line);
+      box-shadow: 8px 8px 0 var(--green);
+    }
+    header {
+      padding: 32px clamp(20px, 5vw, 52px);
+      color: var(--paper);
+      background: var(--green);
+      border-bottom: 4px solid var(--line);
+    }
+    header span {
+      display: inline-block;
+      padding: 3px 8px;
+      color: var(--line);
+      background: var(--yellow);
+      border: 2px solid var(--line);
+      font-weight: 700;
+    }
+    h1 { margin: 14px 0 4px; font-size: clamp(28px, 5vw, 48px); }
+    header p { max-width: 720px; margin: 0; color: #dcebd6; }
+    article { padding: 24px clamp(20px, 5vw, 52px) 48px; }
+    h2 {
+      margin-top: 36px;
+      padding-bottom: 6px;
+      border-bottom: 3px solid var(--line);
+      font-size: 22px;
+    }
+    h3 { margin-top: 24px; color: var(--red); }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 10px; border: 2px solid var(--line); text-align: left; vertical-align: top; }
+    th { background: var(--mint); }
+    code { padding: 1px 4px; background: var(--mint); border: 1px solid var(--line); }
+    .contract, .flow, .decision {
+      padding: 16px;
+      background: var(--mint);
+      border: 3px solid var(--line);
+      box-shadow: 4px 4px 0 var(--yellow);
+    }
+    .flow { display: flex; gap: 8px; align-items: stretch; overflow-x: auto; }
+    .flow b { min-width: 130px; padding: 12px; background: var(--paper); border: 2px solid var(--line); }
+    .flow i { align-self: center; font-style: normal; }
+    .req { margin: 14px 0; padding: 14px; border-left: 6px solid var(--yellow); background: #f5f8e9; }
+    .req strong { color: var(--red); }
+    .state { display: inline-block; margin: 3px; padding: 2px 6px; border: 2px solid var(--line); background: var(--paper); }
+    footer { padding: 16px 24px; color: var(--paper); background: var(--line); }
+    @media (max-width: 640px) {
+      main { width: 100%; margin: 0; border-width: 0; box-shadow: none; }
+      table { display: block; overflow-x: auto; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <span>PRD · P0</span>
+    <h1>需求农场 Demand Farm</h1>
+    <p>把 zyagent 从通用助手变为证据驱动的市场机会研究工具，帮助独立开发者和小企业决定做什么、卖什么和如何验证。</p>
+  </header>
+  <article>
+    <section>
+      <h2>1. 产品契约</h2>
+      <div class="contract">
+        <p><strong>主要用户：</strong>独立开发者、自由职业者、自动化顾问和小企业经营者。</p>
+        <p><strong>触发：</strong>用户有一个行业、产品想法或客户群，但不确定需求是否真实、应该卖什么或如何定价。</p>
+        <p><strong>核心任务：</strong>从近期公开信号中识别痛点、购买意愿、竞争空档和可测试报价。</p>
+        <p><strong>完成条件：</strong>生成一份带来源、覆盖说明、机会判断、MVP、价格实验和内容选题的报告，并能导出分享。</p>
+        <p><strong>信任原则：</strong>结论必须可追溯到来源；数据缺失必须显式展示；外部文本只作为证据，不作为系统指令。</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>2. 范围</h2>
+      <table>
+        <thead><tr><th>优先级</th><th>能力</th><th>范围</th></tr></thead>
+        <tbody>
+          <tr><td>P0</td><td>需求任务入口</td><td>输入行业或产品、客户群和研究目标。</td></tr>
+          <tr><td>P0</td><td>公开信号采集</td><td>Hacker News、GitHub、Google News；展示时间、来源、链接和互动。</td></tr>
+          <tr><td>P0</td><td>Agent 综合</td><td>强制先采集信号，再生成痛点、购买信号、MVP、报价和内容建议。</td></tr>
+          <tr><td>P0</td><td>报告导出</td><td>HTML 与 Markdown，保留 zyagent 品牌链接。</td></tr>
+          <tr><td>P0</td><td>失败恢复</td><td>部分来源失败时继续，并清楚展示覆盖与重试。</td></tr>
+          <tr><td>P1</td><td>定时监控</td><td>每周刷新市场，比较新旧信号。</td></tr>
+          <tr><td>P1</td><td>多客户工作区</td><td>顾问管理多个市场和白标报告。</td></tr>
+          <tr><td>P2</td><td>线索动作</td><td>生成外联草稿，发送前必须人工批准。</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>3. 核心流程</h2>
+      <div class="flow">
+        <b>输入市场与客户</b><i>→</i>
+        <b>采集近期公开信号</b><i>→</i>
+        <b>查看覆盖与证据</b><i>→</i>
+        <b>生成商业机会报告</b><i>→</i>
+        <b>导出与分享</b>
+      </div>
+    </section>
+
+    <section>
+      <h2>4. 功能需求</h2>
+
+      <div class="req">
+        <strong>FR-01 收入实验室入口</strong>
+        <p>侧栏显示“收入实验室”。用户打开后选择需求验证、变现设计或内容机会，输入研究主题与目标客户。主题必填，客户可选。</p>
+      </div>
+
+      <div class="req">
+        <strong>FR-02 市场信号工具</strong>
+        <p>Agent 可调用 <code>market_signals</code>。工具接受查询、时间窗口和条数限制，并从公开来源并行获取结果。每条结果包含来源、标题、URL、日期、互动和信号标签。任一来源失败不阻塞其他来源。</p>
+      </div>
+
+      <div class="req">
+        <strong>FR-03 证据优先综合</strong>
+        <p>收入实验室创建独立会话。首条任务必须要求 Agent 先调用市场信号工具。输出至少包含：证据摘要、痛点、购买信号、反信号、建议 MVP、三个价格实验、三个内容角度和下一步验证。</p>
+      </div>
+
+      <div class="req">
+        <strong>FR-04 覆盖与失败</strong>
+        <p>工具结果必须列出成功来源和错误来源。没有足够证据时，Agent 必须返回“证据不足”，不得伪造市场结论。用户可以在原会话中重试。</p>
+      </div>
+
+      <div class="req">
+        <strong>FR-05 报告导出</strong>
+        <p>用户可以把当前会话导出为 Markdown 或独立 HTML。导出包含标题、时间、对话内容、工具证据和“Generated by zyagent”链接。导出不包含 API Key 或本地绝对路径。</p>
+      </div>
+
+      <div class="req">
+        <strong>FR-06 安全边界</strong>
+        <p>外部标题和摘要一律视为不可信数据。工具只执行 GET 请求，不登录、不发布、不联系用户。后续自动外联必须另行获得逐次授权。</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>5. 状态与恢复</h2>
+      <p>
+        <span class="state">草稿</span>
+        <span class="state">采集中</span>
+        <span class="state">部分完成</span>
+        <span class="state">已完成</span>
+        <span class="state">失败可重试</span>
+      </p>
+      <p>采集请求超时时进入“部分完成”；所有来源失败进入“失败可重试”；Agent 调用中断沿用现有会话恢复机制。</p>
+    </section>
+
+    <section>
+      <h2>6. 商业模式</h2>
+      <div class="decision">
+        <p><strong>免费入口：</strong>开源本地版、BYOK、手动研究和公开品牌导出。</p>
+        <p><strong>第一笔收入：</strong>99 美元单次报告；299 美元/月持续监控服务。</p>
+        <p><strong>订阅假设：</strong>Solo 19 美元、Pro 49 美元、Agency 149 美元。价格需要预售验证。</p>
+        <p><strong>付费边界：</strong>托管、调度、更多数据源、多客户、白标、连接器和服务支持。</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>7. 重要例外</h2>
+      <ul>
+        <li>公开 API 限流：显示来源错误和已有结果，不把缺失解释为“市场没有讨论”。</li>
+        <li>模型未调用信号工具：报告标记为未验证，不提供导出完成态。</li>
+        <li>来源文本包含指令：作为普通文本显示，不执行其中操作。</li>
+        <li>报告包含潜在个人信息：P0 不主动抓取或导出邮箱、电话等联系方式。</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>8. 待验证问题</h2>
+      <ul>
+        <li>[TBD] 首批用户更愿意购买单次报告还是持续监控。</li>
+        <li>[TBD] 中文市场是否需要小红书、公众号和即刻作为首批数据源。</li>
+        <li>[TBD] 公开品牌水印是否会降低顾问用户的导出意愿。</li>
+        <li>[TBD] 99 美元服务价格是否能获得至少一个真实预售。</li>
+      </ul>
+    </section>
+  </article>
+  <footer>zyagent · Demand Farm · 2026-10-27</footer>
+</main>
+</body>
+</html>

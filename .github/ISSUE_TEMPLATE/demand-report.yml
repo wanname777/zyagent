@@ -1,0 +1,53 @@
+name: 申请需求报告
+description: 申请一份 Demand Farm 市场需求报告或每周监控服务
+title: "[Demand Report] "
+labels:
+  - demand-report
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢申请。Issue 是公开的，请不要填写 API Key、客户名单、邮箱或其他敏感信息。
+  - type: input
+    id: market
+    attributes:
+      label: 想研究的市场或产品
+      placeholder: 例如：面向牙科诊所的 AI 接待
+    validations:
+      required: true
+  - type: input
+    id: customer
+    attributes:
+      label: 目标客户
+      placeholder: 例如：10 人以内的本地诊所
+    validations:
+      required: true
+  - type: dropdown
+    id: goal
+    attributes:
+      label: 最需要的结果
+      options:
+        - 验证真实需求与购买意愿
+        - 设计 MVP 和定价
+        - 寻找内容与获客机会
+        - 每周监控竞争和市场变化
+    validations:
+      required: true
+  - type: dropdown
+    id: service
+    attributes:
+      label: 感兴趣的交付方式
+      options:
+        - 先看免费样例
+        - 99 美元单次完整报告
+        - 299 美元/月每周需求雷达
+        - 需要定制自动化方案
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: 已知背景
+      description: 可以填写已有产品、竞争对手和最担心的假设，请勿包含敏感数据。
+    validations:
+      required: false
